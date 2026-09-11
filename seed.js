@@ -1,0 +1,30 @@
+require('dotenv').config();
+const mongoose = require('mongoose');
+const connectDB = require('./config/db');
+const Product = require('./models/Product');
+
+const products = [
+  { name: 'Cedar Desk Tray', description: 'A warm, considered landing place for keys, notes, and daily essentials.', price: 32, category: 'Home', image: 'https://images.unsplash.com/photo-1618220179428-22790b461013?auto=format&fit=crop&w=900&q=80', stock: 24, rating: 4.8 },
+  { name: 'Stoneware Morning Mug', description: 'Hand-finished ceramic with a generous handle and a calm satin glaze.', price: 24, category: 'Home', image: 'https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?auto=format&fit=crop&w=900&q=80', stock: 40, rating: 4.9 },
+  { name: 'Canvas Weekender', description: 'A durable, quietly handsome carryall for short trips and long weekends.', price: 118, category: 'Style', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80', stock: 12, rating: 4.7 },
+  { name: 'Linen Throw', description: 'Soft washed linen that adds texture and an easy layer of comfort.', price: 76, category: 'Home', image: 'https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?auto=format&fit=crop&w=900&q=80', stock: 18, rating: 4.6 },
+  { name: 'Everyday Field Watch', description: 'A precise, unfussy timepiece built for everyday movement.', price: 145, category: 'Style', image: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?auto=format&fit=crop&w=900&q=80', stock: 8, rating: 4.8 },
+  { name: 'Amber Reading Light', description: 'A small pool of warm light for late pages and early mornings.', price: 88, category: 'Home', image: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?auto=format&fit=crop&w=900&q=80', stock: 15, rating: 4.5 },
+  { name: 'Woven Storage Basket', description: 'Hand-woven natural fibre basket for tidy, everyday storage.', price: 42, category: 'Home', image: 'https://images.unsplash.com/photo-1595515106969-1ce29566ff1c?auto=format&fit=crop&w=900&q=80', stock: 22, rating: 4.7 },
+  { name: 'Wool Blend Scarf', description: 'A soft, generously sized scarf for cooler days and easy layering.', price: 54, category: 'Style', image: 'https://images.unsplash.com/photo-1520903920243-00d872a2d1c9?auto=format&fit=crop&w=900&q=80', stock: 20, rating: 4.6 },
+  { name: 'Minimalist Leather Wallet', description: 'A slim, handcrafted wallet built to age beautifully with use.', price: 68, category: 'Style', image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=900&q=80', stock: 25, rating: 4.8 },
+  { name: 'Ceramic Planter', description: 'A simple, matte-finished planter for herbs or small houseplants.', price: 29, category: 'Home', image: 'https://images.unsplash.com/photo-1485955900006-10f4d324d411?auto=format&fit=crop&w=900&q=80', stock: 30, rating: 4.7 },
+  { name: 'Everyday Tote Bag', description: 'A roomy, sturdy canvas tote for groceries, books, or the beach.', price: 48, category: 'Style', image: 'https://images.unsplash.com/photo-1591561954557-26941169b49e?auto=format&fit=crop&w=900&q=80', stock: 35, rating: 4.9 },
+  { name: 'Oak Cutting Board', description: 'A solid oak board with a smooth, food-safe finish for daily prep.', price: 58, category: 'Home', image: 'https://images.unsplash.com/photo-1594213850312-52c6a9ea5df2?auto=format&fit=crop&w=900&q=80', stock: 16, rating: 4.8 },
+  { name: 'Classic Denim Jacket', description: 'A timeless, well-tailored jacket that pairs with almost anything.', price: 98, category: 'Style', image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=900&q=80', stock: 14, rating: 4.6 },
+  { name: 'Glass Carafe Set', description: 'A clean-lined carafe and two glasses for water or morning juice.', price: 36, category: 'Home', image: 'https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=900&q=80', stock: 20, rating: 4.7 },
+  { name: 'Suede Ankle Boots', description: 'Soft suede boots with a low heel, built for all-day comfort.', price: 132, category: 'Style', image: 'https://images.unsplash.com/photo-1521336575822-6da63fb45455?auto=format&fit=crop&w=900&q=80', stock: 10, rating: 4.5 },
+  { name: 'Bamboo Bath Caddy', description: 'A sturdy bamboo tray that rests across the tub for books and tea.', price: 44, category: 'Home', image: 'https://images.unsplash.com/photo-1616627561950-9f746e330187?auto=format&fit=crop&w=900&q=80', stock: 18, rating: 4.6 },
+  { name: 'Merino Wool Sweater', description: 'A breathable, fine-knit sweater that layers well in every season.', price: 112, category: 'Style', image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=900&q=80', stock: 13, rating: 4.8 },
+  { name: 'Linen Table Runner', description: 'A relaxed, textured runner that dresses up any everyday table.', price: 34, category: 'Home', image: 'https://images.unsplash.com/photo-1600166898405-da9535204843?auto=format&fit=crop&w=900&q=80', stock: 26, rating: 4.5 },
+  { name: 'Leather Crossbody Bag', description: 'A compact, versatile bag with adjustable strap for daily carry.', price: 89, category: 'Style', image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?auto=format&fit=crop&w=900&q=80', stock: 17, rating: 4.7 },
+  { name: 'Scented Soy Candle', description: 'A slow-burning candle with a warm, subtle fragrance for any room.', price: 26, category: 'Home', image: 'https://images.unsplash.com/photo-1602874801007-bd458bb1b8b6?auto=format&fit=crop&w=900&q=80', stock: 45, rating: 4.9 }
+];
+
+async function seed() { try { await connectDB(); await Product.deleteMany({}); await Product.insertMany(products); console.log(`${products.length} products added`); } catch (error) { console.error(error.message); process.exitCode = 1; } finally { await mongoose.connection.close(); } }
+seed();
